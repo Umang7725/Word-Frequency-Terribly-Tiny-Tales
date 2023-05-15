@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react'
+import Papa from 'papaparse'
+import _ from 'lodash'
+import Histogram from './Histogram'
+import './App.css'
 
 function App() {
+  const [data, setData] = useState(null)
+
+  const handleSubmit = async () => {
+    const response = await fetch('https://www.terriblytinytales.com/test.txt')
+    const content = await response.text()
+    const words = content.split(/\s+/)
+    const wordCounts = _.countBy(words)
+    const sortedWordCounts = _.orderBy(
+      Object.entries(wordCounts),
+      ([word, count]) => count,
+      'desc'
+    )
+    const histogramData = sortedWordCounts.slice(0, 20).map(([word, count]) => ({ word, count }))
+    setData(histogramData)
+  }
+
+  const handleExport = () => {
+    const csv = Papa.unparse(data)
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'histogram.csv')
+    document.body.appendChild(link)
+    link.click()
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <div className="box">
+        <button className="button" onClick={handleSubmit}>Submit</button>
+        {data && <Histogram data={data} />}
+        {data && <button className="button" onClick={handleExport}>Export</button>}
+      </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
