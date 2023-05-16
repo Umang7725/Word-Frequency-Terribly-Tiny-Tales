@@ -33,13 +33,17 @@ function App() {
   }
 
   return (
+    <>
+   <h1>Terribly Tiny Tales</h1>
     <div className="container">
       <div className="box">
         <button className="button" onClick={handleSubmit}>Submit</button>
         {data && <Histogram data={data} />}
         {data && <button className="button" onClick={handleExport}>Export</button>}
-      </div>
+      </div> 
     </div>
+    <footer> Umang Raj 12018505</footer>
+    </>
   )
 }
 
